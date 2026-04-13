@@ -10,6 +10,8 @@ Prerequisites
 Build requirements:
 - erlang
 - libxml2-dev
+- rust
+- cargo
 
 Test requirements:
 - python

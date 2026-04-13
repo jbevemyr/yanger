@@ -1,0 +1,1 @@
+/home/jb/work/yanger/c_src/rustler_yang_parser/target/release/libyang_parser_rustler_nif.so: /home/jb/work/yanger/c_src/rustler_yang_parser/build.rs /home/jb/work/yanger/c_src/rustler_yang_parser/src/lib.rs

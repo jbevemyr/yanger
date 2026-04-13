@@ -23,10 +23,10 @@ compile: all
 
 all: $(ERL_OBJECTS) $(APP_OBJECTS)
 
-yang_llerror.erl: ../c_src/yang_error.h
+yang_llerror.erl: yang_error_codes.def
 	awk -f mk_llerror.awk < $< > $@
 
-yang_llerror.hrl: ../c_src/yang_error.h
+yang_llerror.hrl: yang_error_codes.def
 	awk -f mk_llerror_hrl.awk < $< > $@
 
 ../ebin/yang.beam: yang_llerror.hrl

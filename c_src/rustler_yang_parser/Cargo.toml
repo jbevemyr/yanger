@@ -1,0 +1,12 @@
+[package]
+name = "yang_parser_rustler_nif"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "yang_parser_rustler_nif"
+crate-type = ["cdylib"]
+
+[dependencies]
+rustler = "0.36"
+libc = "0.2.184"

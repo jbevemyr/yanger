@@ -33,8 +33,8 @@
                   Str :: string()}.
 
 %% @doc A grammar specification for the YANG extension statement Keyword.
-%% The ArgTypeName is either one of the built-in types (see
-%% yang_core_grammar.c), or installed by a call to install_arg_types().
+%% The ArgTypeName is either one of the built-in types (generated from
+%% c_src/rust_atom/core_stmts_data.txt), or installed by a call to install_arg_types().
 -spec install_arg_types(
         [{ArgTypeName :: atom(),
           XsdRegexp :: string() | undefined,
@@ -47,25 +47,25 @@
 %% The parser converts each argument of type ArgTypeName to the erlang
 %% type in specified in ErlType.
 install_arg_types(_Types) ->
-    erlang:nif_error(nif_library_not_loaded).
+    yang_parser_rustler:install_arg_types(_Types).
 
 -spec install_grammar(ModuleName :: atom(), [yang_statement_spec()]) ->
         ok | error.
 %% @doc Install grammar for YANG extension statements for a particular module.
 install_grammar(_ModuleName, _Specs) ->
-    erlang:nif_error(nif_library_not_loaded).
+    yang_parser_rustler:install_grammar(_ModuleName, _Specs).
 
 -spec parse(FileName :: string(), Canonical :: boolean()) ->
         {ok, [yang:stmt()], [Warnings :: error()]}
       | {error, [error()]}.
 %% Returns {error, Errors} if non-recoverable errors are found.
 parse(_FileName, _Canonical) ->
-    erlang:nif_error(nif_library_not_loaded).
+    yang_parser_rustler:parse(_FileName, _Canonical).
 
 -spec get_grammar_module_names() -> [ModuleName :: atom()].
 %% Returns the module names for which grammar has been installed.
 get_grammar_module_names() ->
-    erlang:nif_error(nif_library_not_loaded).
+    yang_parser_rustler:get_grammar_module_names().
 
 -spec get_statement_spec(Keyword :: yang:keyword()) ->
         {value, yang_statement_spec()} | not_found.
@@ -74,11 +74,13 @@ get_grammar_module_names() ->
 %% since the spec is fully expanded (e.g., 'container' will have
 %% smiv2:oid as substmt, if the smiv2 grammar is loaded.)
 get_statement_spec(_Keyword) ->
-    erlang:nif_error(nif_library_not_loaded).
+    yang_parser_rustler:get_statement_spec(_Keyword).
 
 %%% Internal functions
 
 init() ->
-    Nif = filename:join(code:priv_dir(yanger),"yang_parser_nif"),
-    ok = erlang:load_nif(Nif, 0).
+    case code:ensure_loaded(yang_parser_rustler) of
+        {module, yang_parser_rustler} -> ok;
+        Error -> Error
+    end.
 

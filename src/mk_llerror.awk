@@ -1,5 +1,5 @@
 BEGIN {
-    printf("%% NOTE: this file has been generated from yang_error.h.\n");
+    printf("%% NOTE: this file has been generated from yang_error_codes.def.\n");
     printf("%% Do not edit.\n");
     printf("-module(yang_llerror).\n");
     printf("-export([code2err/1, codes/0]).\n\n");

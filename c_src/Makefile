@@ -1,77 +1,33 @@
-
-PARSER_NIF = ../priv/yang_parser_nif.so
 REGEX_NIF = ../priv/w3cregex_nif.so
+YANG_PARSER_RUSTLER_NIF = ../priv/yang_parser_rustler_nif.so
+RUST_ATOM_LIB = rust_atom/target/release/librust_atom.a
+RUSTLER_REGEX_LIB = rustler_w3cregex/target/release/libw3cregex_nif.so
+RUSTLER_YANG_PARSER_LIB = rustler_yang_parser/target/release/libyang_parser_rustler_nif.so
 
-PRIV_FILES = $(PARSER_NIF) $(REGEX_NIF)
-
-CFLAGS = -std=c99
-CWARNINGS = \
-       -Werror \
-       -Wall   \
-       -Wsign-compare \
-       -Wstrict-prototypes \
-       -Wpointer-arith \
-       -Wcast-align \
-       -Wwrite-strings \
-       -Wnested-externs
-
-CFLAGS += -fpic -DDYNAMIC_DRIVER
-
-ifneq ($(DEBUG),)
-  CFLAGS += -g -ggdb
-  CWARNINGS += -Wuninitialized
-  ERLC_FLAGS += +debug_info
-else
-  CFLAGS += -O2
-endif
-
-CFLAGS  += $(CWARNINGS)
-
-ERL_EVAL    = 'io:format("~s", [os:getenv("ROOTDIR")]), erlang:halt(0)'
-ERL_ROOTDIR = $(shell erl -noinput -eval $(ERL_EVAL))
-ifneq ($(findstring /, $(ERL_ROOTDIR)),)
-  CFLAGS += -I$(ERL_ROOTDIR)/usr/include
-endif
-
-XML_CFLAGS ?= $(shell pkg-config --cflags libxml-2.0)
-ifeq ($(XML_CFLAGS),)
-  XML_CFLAGS = -I/usr/include/libxml2
-endif
-CFLAGS += $(XML_CFLAGS)
-XML_LIBS = $(shell pkg-config --libs libxml-2.0)
-ifeq ($(XML_LIBS),)
-  XML_LIBS = -lxml2
-endif
-LIBS += $(XML_LIBS)
-
-LD = $(CC)
-
-ifeq ($(shell uname -s), Darwin)
-  LDDRV_FLAGS = -bundle -undefined dynamic_lookup
-else
-  LDDRV_FLAGS = -shared
-endif
-
-
-C_SOURCES := $(wildcard yang*.c)
-C_HEADERS := $(wildcard yang*.h)
-OBJS := $(C_SOURCES:%.c=./%.o)
+PRIV_FILES = $(REGEX_NIF) $(YANG_PARSER_RUSTLER_NIF)
 
 all: $(PRIV_FILES)
 
-$(OBJS): $(C_HEADERS)
+$(RUST_ATOM_LIB):
+	cargo build --manifest-path rust_atom/Cargo.toml --release
 
-$(PARSER_NIF): $(OBJS)
-	$(LD) $(LDDRV_FLAGS) -o $@ $^ $(LIBS)
+$(RUSTLER_REGEX_LIB):
+	cargo build --manifest-path rustler_w3cregex/Cargo.toml --release
 
-$(REGEX_NIF): w3cregex_nif.o
-	$(LD) $(LDDRV_FLAGS) -o $@ $^ $(LIBS)
+$(RUSTLER_YANG_PARSER_LIB): $(RUST_ATOM_LIB)
+	cargo build --manifest-path rustler_yang_parser/Cargo.toml --release
+
+$(REGEX_NIF): $(RUSTLER_REGEX_LIB)
+	cp $(RUSTLER_REGEX_LIB) $(REGEX_NIF)
+
+$(YANG_PARSER_RUSTLER_NIF): $(RUSTLER_YANG_PARSER_LIB)
+	cp $(RUSTLER_YANG_PARSER_LIB) $(YANG_PARSER_RUSTLER_NIF)
 
 debug:
 	$(MAKE) DEBUG=true all
 
-# Keep .o file around (handy when gdb debugging...)
-.PRECIOUS: $(OBJS)
-
 clean:
-	rm -f ../priv/*.so ./*.so ./*.o *.o
+	rm -f ../priv/*.so
+	rm -rf rust_atom/target
+	rm -rf rustler_w3cregex/target
+	rm -rf rustler_yang_parser/target

@@ -184,7 +184,7 @@
 %-type hookfun() :: fun((...) -> {#yctx{}, term()}).
 -type hookfun() :: term().
 
-%% see yang_parser_nif.c
+%% see yang_parser_rustler NIF implementation
 -type no_arg() :: [].
 -type arg_type() :: no_arg() | binary() | atom() | integer() | identifier_ref().
 
