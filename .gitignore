@@ -6,3 +6,5 @@ priv
 *.beam
 *.plt
 src/yang_llerror.erl
+
+c_src/**/target/

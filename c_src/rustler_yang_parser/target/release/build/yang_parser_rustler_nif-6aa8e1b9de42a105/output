@@ -1,7 +1,0 @@
-cargo:rustc-link-search=native=/home/jb/work/yanger/c_src/rustler_yang_parser/../rust_atom/target/release
-cargo:rustc-link-lib=static=rust_atom
-cargo:rustc-link-lib=xml2
-cargo:rustc-link-lib=dl
-cargo:rustc-link-lib=pthread
-cargo:rustc-link-lib=gcc_s
-cargo:rustc-link-lib=m
