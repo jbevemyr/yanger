@@ -5,5 +5,5 @@ build:
 	@echo "Build complete"
 
 clean:
-	rm -r lux_logs
+	rm -rf lux_logs
 
